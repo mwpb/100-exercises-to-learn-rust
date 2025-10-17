@@ -10,6 +10,19 @@
 //
 // Use only what you learned! No loops yet, so you'll have to use recursion!
 
+fn factorial_inner(n: u32, acc: u32) -> u32 {
+    let n = match n {
+        0 => return 1,
+        _ => n,
+    };
+
+    factorial_inner(n - 1, n * acc)
+}
+
+fn factorial(n: u32) -> u32 {
+    factorial_inner(n, 1)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::factorial;
