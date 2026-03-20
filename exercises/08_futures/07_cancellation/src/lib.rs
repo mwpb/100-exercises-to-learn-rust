@@ -28,6 +28,8 @@ mod tests {
         let messages = vec!["hello", "from", "this", "task"];
         let timeout = Duration::from_millis(20);
         let handle = tokio::spawn(run(listener, messages.len(), timeout.clone()));
+        // the task is looking for message 0
+        // but keeps yielding because it hasn't been sent it yet
 
         for message in messages {
             let mut socket = tokio::net::TcpStream::connect(addr).await.unwrap();
@@ -38,7 +40,7 @@ mod tests {
             // Send first half
             writer.write_all(beginning.as_bytes()).await.unwrap();
             tokio::time::sleep(timeout * 2).await;
-            writer.write_all(end.as_bytes()).await.unwrap();
+            writer.write_all(end.as_bytes()).await.unwrap(); // this doesn't get run for so long that the timeout gets hit
 
             // Close the write side of the socket
             let _ = writer.shutdown().await;
@@ -46,6 +48,6 @@ mod tests {
 
         let buffered = handle.await.unwrap();
         let buffered = std::str::from_utf8(&buffered).unwrap();
-        assert_eq!(buffered, "");
+        assert_eq!(buffered, "hefrthta");
     }
 }
